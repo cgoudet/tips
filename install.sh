@@ -23,7 +23,7 @@ sudo apt-get install -f
 # sudo apt-get install lib32z1 lib32ncurses5 libpangox-1.0-0 network-manager-openconnect network-manager-pptp network-manager-vpnc network-manager-openvpn
 
 # tesseract for ocr
-# tesseract-ocr tesseract-ocr-fra
+# sudo apt-get install -y tesseract-ocr tesseract-ocr-fra
 # Add <policy domain="coder" rights="read" pattern="PDF" />
 # to /etc/ImageMagick-6/policy.xml
 
