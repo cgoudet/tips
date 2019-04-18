@@ -1,0 +1,12 @@
+[user]
+	name = Christophe Goudet
+	email = goudetchristophe@laposte.net
+[alias]
+	amend = commit --amend
+	st = status
+	co = checkout
+	cam = commit -am
+	undo = git reset --soft HEAD^
+
+[credential]
+    helper = cache --timeout 30000
