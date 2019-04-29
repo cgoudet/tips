@@ -1,0 +1,10 @@
+{
+    "editor.suggestSelection": "first",
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "python.linter": "autopep8",
+    "debug.enableAllHovers": true,
+    "python.jediEnabled": false,
+    "python.linting.pep8CategorySeverity.E": "Hint",
+    "workbench.startupEditor": "newUntitledFile"
+}
