@@ -1,12 +1,13 @@
+sudo add-apt-repository ppa:webupd8team/atom
 sudo apt-get update
 sudo apt-get upgrade -y
 sudo apt-get autoremove --purge pidgin sylpheed parole -y
 
 sudo apt-get install -y \
-python3-pip python3-dev postgresql \
+python3-pip python3-dev \
 docker.io docker-compose \
 emacs vlc terminator youtube-dl \
-nautilus-dropbox owncloud-client keepassx jabref zim \
+owncloud-client keepassx jabref atom \
 build-essential git virtualbox virtualenv 
 
 # for porblem with owncloud
@@ -14,16 +15,6 @@ sudo apt install libgnome-keyring0 -y
 
 # library for pyodbc
 sudo apt-get install unixodbc-dev -y
-
-# install visualstudio code
-sudo dpkg -i *.deb
-sudo apt-get install -f
-
-bash install_vscode_extensions.sh
-cp settings.json keybindings.json ~/.config/Code/User/.
-
-# Cisco
-# sudo apt-get install lib32z1 lib32ncurses5 libpangox-1.0-0 network-manager-openconnect network-manager-pptp network-manager-vpnc network-manager-openvpn
 
 # tesseract for ocr
 # sudo apt-get install -y tesseract-ocr tesseract-ocr-fra
