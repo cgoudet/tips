@@ -1,0 +1,822 @@
+
+<!DOCTYPE html>
+    <html lang="fr-FR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta itemprop="image" content="https://blog.octo.com/wp-content/themes/octotalks/images/favicon_128.png">
+            <title>Apprentissage distribué avec Spark | OCTO Talks !</title>
+            <link rel="profile" href="http://gmpg.org/xfn/11">
+            <link rel="pingback" href="https://blog.octo.com/xmlrpc.php">
+            <link rel="shortcut icon" href="https://blog.octo.com/wp-content/themes/octotalks/favicon.ico" />
+            <link rel="alternate" hreflang="fr-fr" href="https://blog.octo.com/apprentissage-distribue-avec-spark/" />
+<link rel='dns-prefetch' href='//www.google.com' />
+<link rel='dns-prefetch' href='//fonts.googleapis.com' />
+<link rel='dns-prefetch' href='//s.w.org' />
+<link rel="alternate" type="application/rss+xml" title="OCTO Talks ! &raquo; Flux" href="https://blog.octo.com/feed/" />
+<link rel="alternate" type="application/rss+xml" title="OCTO Talks ! &raquo; Flux des commentaires" href="https://blog.octo.com/comments/feed/" />
+<link rel="alternate" type="application/rss+xml" title="OCTO Talks ! &raquo; Apprentissage distribué avec Spark Flux des commentaires" href="https://blog.octo.com/apprentissage-distribue-avec-spark/feed/" />
+		<script type="text/javascript">
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/12.0.0-1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/12.0.0-1\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/blog.octo.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=5.2.3"}};
+			!function(a,b,c){function d(a,b){var c=String.fromCharCode;l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,a),0,0);var d=k.toDataURL();l.clearRect(0,0,k.width,k.height),l.fillText(c.apply(this,b),0,0);var e=k.toDataURL();return d===e}function e(a){var b;if(!l||!l.fillText)return!1;switch(l.textBaseline="top",l.font="600 32px Arial",a){case"flag":return!(b=d([55356,56826,55356,56819],[55356,56826,8203,55356,56819]))&&(b=d([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]),!b);case"emoji":return b=d([55357,56424,55356,57342,8205,55358,56605,8205,55357,56424,55356,57340],[55357,56424,55356,57342,8203,55358,56605,8203,55357,56424,55356,57340]),!b}return!1}function f(a){var c=b.createElement("script");c.src=a,c.defer=c.type="text/javascript",b.getElementsByTagName("head")[0].appendChild(c)}var g,h,i,j,k=b.createElement("canvas"),l=k.getContext&&k.getContext("2d");for(j=Array("flag","emoji"),c.supports={everything:!0,everythingExceptFlag:!0},i=0;i<j.length;i++)c.supports[j[i]]=e(j[i]),c.supports.everything=c.supports.everything&&c.supports[j[i]],"flag"!==j[i]&&(c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&c.supports[j[i]]);c.supports.everythingExceptFlag=c.supports.everythingExceptFlag&&!c.supports.flag,c.DOMReady=!1,c.readyCallback=function(){c.DOMReady=!0},c.supports.everything||(h=function(){c.readyCallback()},b.addEventListener?(b.addEventListener("DOMContentLoaded",h,!1),a.addEventListener("load",h,!1)):(a.attachEvent("onload",h),b.attachEvent("onreadystatechange",function(){"complete"===b.readyState&&c.readyCallback()})),g=c.source||{},g.concatemoji?f(g.concatemoji):g.wpemoji&&g.twemoji&&(f(g.twemoji),f(g.wpemoji)))}(window,document,window._wpemojiSettings);
+		</script>
+		<style type="text/css">
+img.wp-smiley,
+img.emoji {
+	display: inline !important;
+	border: none !important;
+	box-shadow: none !important;
+	height: 1em !important;
+	width: 1em !important;
+	margin: 0 .07em !important;
+	vertical-align: -0.1em !important;
+	background: none !important;
+	padding: 0 !important;
+}
+</style>
+	<link rel='stylesheet' id='wp-block-library-css'  href='https://blog.octo.com/wp-includes/css/dist/block-library/style.min.css?ver=5.2.3' type='text/css' media='all' />
+<link rel='stylesheet' id='cookie-notice-front-css'  href='https://blog.octo.com/wp-content/plugins/cookie-notice/css/front.min.css?ver=5.2.3' type='text/css' media='all' />
+<link rel='stylesheet' id='sharify-css'  href='https://blog.octo.com/wp-content/plugins/sharify/sharify-style.php' type='text/css' media='all' />
+<link rel='stylesheet' id='sharify-icon-css'  href='https://blog.octo.com/wp-content/plugins/sharify/icon/css/sharify.css' type='text/css' media='all' />
+<link rel='stylesheet' id='sharify-font-css'  href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400' type='text/css' media='all' />
+<link rel='stylesheet' id='wpml-legacy-dropdown-0-css'  href='//blog.octo.com/wp-content/plugins/sitepress-multilingual-cms/templates/language-switchers/legacy-dropdown/style.css?ver=1' type='text/css' media='all' />
+<style id='wpml-legacy-dropdown-0-inline-css' type='text/css'>
+.wpml-ls-statics-shortcode_actions, .wpml-ls-statics-shortcode_actions .wpml-ls-sub-menu, .wpml-ls-statics-shortcode_actions a {border-color:#cdcdcd;}.wpml-ls-statics-shortcode_actions a {color:#444444;background-color:#ffffff;}.wpml-ls-statics-shortcode_actions a:hover,.wpml-ls-statics-shortcode_actions a:focus {color:#000000;background-color:#eeeeee;}.wpml-ls-statics-shortcode_actions .wpml-ls-current-language>a {color:#444444;background-color:#ffffff;}.wpml-ls-statics-shortcode_actions .wpml-ls-current-language:hover>a, .wpml-ls-statics-shortcode_actions .wpml-ls-current-language>a:focus {color:#000000;background-color:#eeeeee;}
+</style>
+<link rel='stylesheet' id='octo-style-css'  href='https://blog.octo.com/wp-content/themes/octotalks/style.css?ver=20122018' type='text/css' media='all' />
+<link rel='stylesheet' id='octo-highlight-css'  href='https://blog.octo.com/wp-content/themes/octotalks/css/library/monokai-sublime.css?ver=01042017' type='text/css' media='all' />
+<link rel='stylesheet' id='algolia-autocomplete-css'  href='https://blog.octo.com/wp-content/plugins/search-by-algolia-instant-relevant-results/includes/../css/algolia-autocomplete.css?ver=2.11.3' type='text/css' media='screen' />
+<script type='text/javascript' src='https://blog.octo.com/wp-includes/js/jquery/jquery.js?ver=1.12.4-wp'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1'></script>
+<script type='text/javascript' src='//blog.octo.com/wp-content/plugins/sitepress-multilingual-cms/templates/language-switchers/legacy-dropdown/script.js?ver=1'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/themes/octotalks/js/html5shiv.min.js?ver=01042017'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-includes/js/underscore.min.js?ver=1.8.3'></script>
+<script type='text/javascript'>
+/* <![CDATA[ */
+var _wpUtilSettings = {"ajax":{"url":"\/wp-admin\/admin-ajax.php"}};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://blog.octo.com/wp-includes/js/wp-util.min.js?ver=5.2.3'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/plugins/search-by-algolia-instant-relevant-results/includes/../js/algoliasearch/algoliasearch.jquery.min.js?ver=2.11.3'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/plugins/search-by-algolia-instant-relevant-results/includes/../js/autocomplete.js/autocomplete.min.js?ver=2.11.3'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/plugins/search-by-algolia-instant-relevant-results/includes/../js/autocomplete-noconflict.js?ver=2.11.3'></script>
+<link rel='https://api.w.org/' href='https://blog.octo.com/wp-json/' />
+<link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://blog.octo.com/xmlrpc.php?rsd" />
+<link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://blog.octo.com/wp-includes/wlwmanifest.xml" /> 
+<link rel='prev' title='Le multithreading zen' href='https://blog.octo.com/le-multithreading-zen/' />
+<link rel='next' title='HDInsight : Le Big Data selon Microsoft' href='https://blog.octo.com/hdinsight-le-big-data-selon-microsoft/' />
+<link rel="canonical" href="https://blog.octo.com/apprentissage-distribue-avec-spark/" />
+<link rel='shortlink' href='https://blog.octo.com/?p=43364' />
+<link rel="alternate" type="application/json+oembed" href="https://blog.octo.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblog.octo.com%2Fapprentissage-distribue-avec-spark%2F" />
+<link rel="alternate" type="text/xml+oembed" href="https://blog.octo.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fblog.octo.com%2Fapprentissage-distribue-avec-spark%2F&#038;format=xml" />
+<meta name="generator" content="WPML ver:4.2.0 stt:1,4,44;" />
+<script async src='https://www.googletagmanager.com/gtag/js?id=UA-3350117-4'></script><script>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    gtag('js', new Date());
+                    gtag('config', 'UA-3350117-4');
+                  </script><script type="text/javascript">var algolia = {"debug":false,"application_id":"HC7JCOFKQW","search_api_key":"2483c37c886017d92d1c5852913ac707","powered_by_enabled":false,"query":"","autocomplete":{"sources":[{"index_id":"posts_post","index_name":"prod_posts_post","label":"Articles","admin_name":"Articles","position":10,"max_suggestions":5,"tmpl_suggestion":"autocomplete-post-suggestion","enabled":true}],"input_selector":"input[name='s']:not('.no-autocomplete')"},"indices":{"searchable_posts":{"name":"prod_searchable_posts","id":"searchable_posts","enabled":true,"replicas":[]},"posts_post":{"name":"prod_posts_post","id":"posts_post","enabled":true,"replicas":[]}}};</script><script type="text/html" id="tmpl-autocomplete-header">
+  <div class="autocomplete-header">
+  </div>
+</script>
+
+<script type="text/html" id="tmpl-autocomplete-post-suggestion">
+  <a class="suggestion-link" href="{{ data.permalink }}" title="{{ data.post_title }}">
+        <div class="suggestion-post-attributes">
+          <span class="suggestion-post-title">{{{ data._highlightResult.post_title.value }}}</span>
+        </div>
+  </a>
+</script>
+
+<script type="text/html" id="tmpl-autocomplete-term-suggestion">
+  <a class="suggestion-link" href="{{ data.permalink }}" title="{{ data.name }}">
+    <svg viewBox="0 0 21 21" width="21" height="21">
+      <svg width="21" height="21" viewBox="0 0 21 21">
+        <path
+            d="M4.662 8.72l-1.23 1.23c-.682.682-.68 1.792.004 2.477l5.135 5.135c.7.693 1.8.688 2.48.005l1.23-1.23 5.35-5.346c.31-.31.54-.92.51-1.36l-.32-4.29c-.09-1.09-1.05-2.06-2.15-2.14l-4.3-.33c-.43-.03-1.05.2-1.36.51l-.79.8-2.27 2.28-2.28 2.27zm9.826-.98c.69 0 1.25-.56 1.25-1.25s-.56-1.25-1.25-1.25-1.25.56-1.25 1.25.56 1.25 1.25 1.25z"
+            fill-rule="evenodd"></path>
+      </svg>
+    </svg>
+    <span class="suggestion-post-title">{{{ data._highlightResult.name.value }}}</span>
+  </a>
+</script>
+
+<script type="text/html" id="tmpl-autocomplete-user-suggestion">
+  <a class="suggestion-link user-suggestion-link" href="{{ data.posts_url }}" title="{{ data.display_name }}">
+    <# if ( data.avatar_url ) { #>
+      <img class="suggestion-user-thumbnail" src="{{ data.avatar_url }}" alt="{{ data.display_name }}">
+      <# } #>
+
+        <span class="suggestion-post-title">{{{ data._highlightResult.display_name.value }}}</span>
+  </a>
+</script>
+
+<script type="text/html" id="tmpl-autocomplete-footer">
+  <div class="autocomplete-footer">
+    <div class="autocomplete-footer-branding">
+      <a href="#" class="algolia-powered-by-link" title="Algolia">
+        <svg width="130" viewBox="0 0 130 18" xmlns="http://www.w3.org/2000/svg">
+          <title>Search by Algolia</title>
+          <defs>
+            <linearGradient x1="-36.868%" y1="134.936%" x2="129.432%" y2="-27.7%" id="a">
+              <stop stop-color="#00AEFF" offset="0%"/>
+              <stop stop-color="#3369E7" offset="100%"/>
+            </linearGradient>
+          </defs>
+          <g fill="none" fill-rule="evenodd">
+            <path
+                d="M59.399.022h13.299a2.372 2.372 0 0 1 2.377 2.364V15.62a2.372 2.372 0 0 1-2.377 2.364H59.399a2.372 2.372 0 0 1-2.377-2.364V2.381A2.368 2.368 0 0 1 59.399.022z"
+                fill="url(#a)"/>
+            <path
+                d="M66.257 4.56c-2.815 0-5.1 2.272-5.1 5.078 0 2.806 2.284 5.072 5.1 5.072 2.815 0 5.1-2.272 5.1-5.078 0-2.806-2.279-5.072-5.1-5.072zm0 8.652c-1.983 0-3.593-1.602-3.593-3.574 0-1.972 1.61-3.574 3.593-3.574 1.983 0 3.593 1.602 3.593 3.574a3.582 3.582 0 0 1-3.593 3.574zm0-6.418v2.664c0 .076.082.131.153.093l2.377-1.226c.055-.027.071-.093.044-.147a2.96 2.96 0 0 0-2.465-1.487c-.055 0-.11.044-.11.104l.001-.001zm-3.33-1.956l-.312-.311a.783.783 0 0 0-1.106 0l-.372.37a.773.773 0 0 0 0 1.101l.307.305c.049.049.121.038.164-.011.181-.245.378-.479.597-.697.225-.223.455-.42.707-.599.055-.033.06-.109.016-.158h-.001zm5.001-.806v-.616a.781.781 0 0 0-.783-.779h-1.824a.78.78 0 0 0-.783.779v.632c0 .071.066.12.137.104a5.736 5.736 0 0 1 1.588-.223c.52 0 1.035.071 1.534.207a.106.106 0 0 0 .131-.104z"
+                fill="#FFF"/>
+            <path
+                d="M102.162 13.762c0 1.455-.372 2.517-1.123 3.193-.75.676-1.895 1.013-3.44 1.013-.564 0-1.736-.109-2.673-.316l.345-1.689c.783.163 1.819.207 2.361.207.86 0 1.473-.174 1.84-.523.367-.349.548-.866.548-1.553v-.349a6.374 6.374 0 0 1-.838.316 4.151 4.151 0 0 1-1.194.158 4.515 4.515 0 0 1-1.616-.278 3.385 3.385 0 0 1-1.254-.817 3.744 3.744 0 0 1-.811-1.351c-.192-.539-.29-1.504-.29-2.212 0-.665.104-1.498.307-2.054a3.925 3.925 0 0 1 .904-1.433 4.124 4.124 0 0 1 1.441-.926 5.31 5.31 0 0 1 1.945-.365c.696 0 1.337.087 1.961.191a15.86 15.86 0 0 1 1.588.332v8.456h-.001zm-5.954-4.206c0 .893.197 1.885.592 2.299.394.414.904.621 1.528.621.34 0 .663-.049.964-.142a2.75 2.75 0 0 0 .734-.332v-5.29a8.531 8.531 0 0 0-1.413-.18c-.778-.022-1.369.294-1.786.801-.411.507-.619 1.395-.619 2.223zm16.12 0c0 .719-.104 1.264-.318 1.858a4.389 4.389 0 0 1-.904 1.52c-.389.42-.854.746-1.402.975-.548.229-1.391.36-1.813.36-.422-.005-1.26-.125-1.802-.36a4.088 4.088 0 0 1-1.397-.975 4.486 4.486 0 0 1-.909-1.52 5.037 5.037 0 0 1-.329-1.858c0-.719.099-1.411.318-1.999.219-.588.526-1.09.92-1.509.394-.42.865-.741 1.402-.97a4.547 4.547 0 0 1 1.786-.338 4.69 4.69 0 0 1 1.791.338c.548.229 1.019.55 1.402.97.389.42.69.921.909 1.509.23.588.345 1.28.345 1.999h.001zm-2.191.005c0-.921-.203-1.689-.597-2.223-.394-.539-.948-.806-1.654-.806-.707 0-1.26.267-1.654.806-.394.539-.586 1.302-.586 2.223 0 .932.197 1.558.592 2.098.394.545.948.812 1.654.812.707 0 1.26-.272 1.654-.812.394-.545.592-1.166.592-2.098h-.001zm6.962 4.707c-3.511.016-3.511-2.822-3.511-3.274L113.583.926l2.142-.338v10.003c0 .256 0 1.88 1.375 1.885v1.792h-.001zm3.774 0h-2.153V5.072l2.153-.338v9.534zm-1.079-10.542c.718 0 1.304-.578 1.304-1.291 0-.714-.581-1.291-1.304-1.291-.723 0-1.304.578-1.304 1.291 0 .714.586 1.291 1.304 1.291zm6.431 1.013c.707 0 1.304.087 1.786.262.482.174.871.42 1.156.73.285.311.488.735.608 1.182.126.447.186.937.186 1.476v5.481a25.24 25.24 0 0 1-1.495.251c-.668.098-1.419.147-2.251.147a6.829 6.829 0 0 1-1.517-.158 3.213 3.213 0 0 1-1.178-.507 2.455 2.455 0 0 1-.761-.904c-.181-.37-.274-.893-.274-1.438 0-.523.104-.855.307-1.215.208-.36.487-.654.838-.883a3.609 3.609 0 0 1 1.227-.49 7.073 7.073 0 0 1 2.202-.103c.263.027.537.076.833.147v-.349c0-.245-.027-.479-.088-.697a1.486 1.486 0 0 0-.307-.583c-.148-.169-.34-.3-.581-.392a2.536 2.536 0 0 0-.915-.163c-.493 0-.942.06-1.353.131-.411.071-.75.153-1.008.245l-.257-1.749c.268-.093.668-.185 1.183-.278a9.335 9.335 0 0 1 1.66-.142l-.001-.001zm.181 7.731c.657 0 1.145-.038 1.484-.104v-2.168a5.097 5.097 0 0 0-1.978-.104c-.241.033-.46.098-.652.191a1.167 1.167 0 0 0-.466.392c-.121.169-.175.267-.175.523 0 .501.175.79.493.981.323.196.75.289 1.293.289h.001zM84.109 4.794c.707 0 1.304.087 1.786.262.482.174.871.42 1.156.73.29.316.487.735.608 1.182.126.447.186.937.186 1.476v5.481a25.24 25.24 0 0 1-1.495.251c-.668.098-1.419.147-2.251.147a6.829 6.829 0 0 1-1.517-.158 3.213 3.213 0 0 1-1.178-.507 2.455 2.455 0 0 1-.761-.904c-.181-.37-.274-.893-.274-1.438 0-.523.104-.855.307-1.215.208-.36.487-.654.838-.883a3.609 3.609 0 0 1 1.227-.49 7.073 7.073 0 0 1 2.202-.103c.257.027.537.076.833.147v-.349c0-.245-.027-.479-.088-.697a1.486 1.486 0 0 0-.307-.583c-.148-.169-.34-.3-.581-.392a2.536 2.536 0 0 0-.915-.163c-.493 0-.942.06-1.353.131-.411.071-.75.153-1.008.245l-.257-1.749c.268-.093.668-.185 1.183-.278a8.89 8.89 0 0 1 1.66-.142l-.001-.001zm.186 7.736c.657 0 1.145-.038 1.484-.104v-2.168a5.097 5.097 0 0 0-1.978-.104c-.241.033-.46.098-.652.191a1.167 1.167 0 0 0-.466.392c-.121.169-.175.267-.175.523 0 .501.175.79.493.981.318.191.75.289 1.293.289h.001zm8.682 1.738c-3.511.016-3.511-2.822-3.511-3.274L89.461.926l2.142-.338v10.003c0 .256 0 1.88 1.375 1.885v1.792h-.001z"
+                fill="#182359"/>
+            <path
+                d="M5.027 11.025c0 .698-.252 1.246-.757 1.644-.505.397-1.201.596-2.089.596-.888 0-1.615-.138-2.181-.414v-1.214c.358.168.739.301 1.141.397.403.097.778.145 1.125.145.508 0 .884-.097 1.125-.29a.945.945 0 0 0 .363-.779.978.978 0 0 0-.333-.747c-.222-.204-.68-.446-1.375-.725-.716-.29-1.221-.621-1.515-.994-.294-.372-.44-.82-.44-1.343 0-.655.233-1.171.698-1.547.466-.376 1.09-.564 1.875-.564.752 0 1.5.165 2.245.494l-.408 1.047c-.698-.294-1.321-.44-1.869-.44-.415 0-.73.09-.945.271a.89.89 0 0 0-.322.717c0 .204.043.379.129.524.086.145.227.282.424.411.197.129.551.299 1.063.51.577.24.999.464 1.268.671.269.208.466.442.591.704.125.261.188.569.188.924l-.001.002zm3.98 2.24c-.924 0-1.646-.269-2.167-.808-.521-.539-.782-1.281-.782-2.226 0-.97.242-1.733.725-2.288.483-.555 1.148-.833 1.993-.833.784 0 1.404.238 1.858.714.455.476.682 1.132.682 1.966v.682H7.357c.018.577.174 1.02.467 1.329.294.31.707.465 1.241.465.351 0 .678-.033.98-.099a5.1 5.1 0 0 0 .975-.33v1.026a3.865 3.865 0 0 1-.935.312 5.723 5.723 0 0 1-1.08.091l.002-.001zm-.231-5.199c-.401 0-.722.127-.964.381s-.386.625-.432 1.112h2.696c-.007-.491-.125-.862-.354-1.115-.229-.252-.544-.379-.945-.379l-.001.001zm7.692 5.092l-.252-.827h-.043c-.286.362-.575.608-.865.739-.29.131-.662.196-1.117.196-.584 0-1.039-.158-1.367-.473-.328-.315-.491-.761-.491-1.337 0-.612.227-1.074.682-1.386.455-.312 1.148-.482 2.079-.51l1.026-.032v-.317c0-.38-.089-.663-.266-.851-.177-.188-.452-.282-.824-.282-.304 0-.596.045-.876.134a6.68 6.68 0 0 0-.806.317l-.408-.902a4.414 4.414 0 0 1 1.058-.384 4.856 4.856 0 0 1 1.085-.132c.756 0 1.326.165 1.711.494.385.329.577.847.577 1.552v4.002h-.902l-.001-.001zm-1.88-.859c.458 0 .826-.128 1.104-.384.278-.256.416-.615.416-1.077v-.516l-.763.032c-.594.021-1.027.121-1.297.298s-.406.448-.406.814c0 .265.079.47.236.615.158.145.394.218.709.218h.001zm7.557-5.189c.254 0 .464.018.628.054l-.124 1.176a2.383 2.383 0 0 0-.559-.064c-.505 0-.914.165-1.227.494-.313.329-.47.757-.47 1.284v3.105h-1.262V7.218h.988l.167 1.047h.064c.197-.354.454-.636.771-.843a1.83 1.83 0 0 1 1.023-.312h.001zm4.125 6.155c-.899 0-1.582-.262-2.049-.787-.467-.525-.701-1.277-.701-2.259 0-.999.244-1.767.733-2.304.489-.537 1.195-.806 2.119-.806.627 0 1.191.116 1.692.349l-.381 1.015c-.534-.208-.974-.312-1.321-.312-1.028 0-1.542.682-1.542 2.046 0 .666.128 1.166.384 1.501.256.335.631.502 1.125.502a3.23 3.23 0 0 0 1.595-.419v1.101a2.53 2.53 0 0 1-.722.285 4.356 4.356 0 0 1-.932.086v.002zm8.277-.107h-1.268V9.506c0-.458-.092-.8-.277-1.026-.184-.226-.477-.338-.878-.338-.53 0-.919.158-1.168.475-.249.317-.373.848-.373 1.593v2.949h-1.262V4.801h1.262v2.122c0 .34-.021.704-.064 1.09h.081a1.76 1.76 0 0 1 .717-.666c.306-.158.663-.236 1.072-.236 1.439 0 2.159.725 2.159 2.175v3.873l-.001-.001zm7.649-6.048c.741 0 1.319.269 1.732.806.414.537.62 1.291.62 2.261 0 .974-.209 1.732-.628 2.275-.419.542-1.001.814-1.746.814-.752 0-1.336-.27-1.751-.811h-.086l-.231.704h-.945V4.801h1.262v1.987l-.021.655-.032.553h.054c.401-.591.992-.886 1.772-.886zm-.328 1.031c-.508 0-.875.149-1.098.448-.224.299-.339.799-.346 1.501v.086c0 .723.115 1.247.344 1.571.229.324.603.486 1.123.486.448 0 .787-.177 1.018-.532.231-.354.346-.867.346-1.536 0-1.35-.462-2.025-1.386-2.025l-.001.001zm3.244-.924h1.375l1.209 3.368c.183.48.304.931.365 1.354h.043c.032-.197.091-.436.177-.717.086-.281.541-1.616 1.364-4.004h1.364l-2.541 6.73c-.462 1.235-1.232 1.853-2.31 1.853-.279 0-.551-.03-.816-.091v-.999c.19.043.406.064.65.064.609 0 1.037-.353 1.284-1.058l.22-.559-2.385-5.941h.001z"
+                fill="#1D3657"/>
+          </g>
+        </svg>
+      </a>
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="tmpl-autocomplete-empty">
+  <div class="autocomplete-empty">
+      Aucun résultat trouvé pour     <span class="empty-query">"{{ data.query }}"</span>
+  </div>
+</script>
+
+<script type="text/javascript">
+  jQuery(function () {
+    /* init Algolia client */
+    var client = algoliasearch(algolia.application_id, algolia.search_api_key);
+
+    /* setup default sources */
+    var sources = [];
+    jQuery.each(algolia.autocomplete.sources, function (i, config) {
+      var suggestion_template = wp.template(config['tmpl_suggestion']);
+      sources.push({
+        source: algoliaAutocomplete.sources.hits(client.initIndex(config['index_name']), {
+          hitsPerPage: config['max_suggestions'],
+          attributesToSnippet: [
+            'content:10'
+          ],
+          highlightPreTag: '__ais-highlight__',
+          highlightPostTag: '__/ais-highlight__'
+        }),
+        templates: {
+          header: function () {
+            return wp.template('autocomplete-header')({
+              label: _.escape(config['label'])
+            });
+          },
+          suggestion: function (hit) {
+            for (var key in hit._highlightResult) {
+              /* We do not deal with arrays. */
+              if (typeof hit._highlightResult[key].value !== 'string') {
+                continue;
+              }
+              hit._highlightResult[key].value = _.escape(hit._highlightResult[key].value);
+              hit._highlightResult[key].value = hit._highlightResult[key].value.replace(/__ais-highlight__/g, '<em>').replace(/__\/ais-highlight__/g, '</em>');
+            }
+
+            for (var key in hit._snippetResult) {
+              /* We do not deal with arrays. */
+              if (typeof hit._snippetResult[key].value !== 'string') {
+                continue;
+              }
+
+              hit._snippetResult[key].value = _.escape(hit._snippetResult[key].value);
+              hit._snippetResult[key].value = hit._snippetResult[key].value.replace(/__ais-highlight__/g, '<em>').replace(/__\/ais-highlight__/g, '</em>');
+            }
+
+            return suggestion_template(hit);
+          }
+        }
+      });
+
+    });
+
+    /* Setup dropdown menus */
+    jQuery(algolia.autocomplete.input_selector).each(function (i) {
+      var $searchInput = jQuery(this);
+
+      var config = {
+        debug: algolia.debug,
+        hint: false,
+        openOnFocus: true,
+        appendTo: 'body',
+        templates: {
+          empty: wp.template('autocomplete-empty')
+        }
+      };
+
+      if (algolia.powered_by_enabled) {
+        config.templates.footer = wp.template('autocomplete-footer');
+      }
+
+      /* Instantiate autocomplete.js */
+      var autocomplete = algoliaAutocomplete($searchInput[0], config, sources)
+      .on('autocomplete:selected', function (e, suggestion) {
+        /* Redirect the user when we detect a suggestion selection. */
+        window.location.href = suggestion.permalink;
+      });
+
+      /* Force the dropdown to be re-drawn on scroll to handle fixed containers. */
+      jQuery(window).scroll(function() {
+        if(autocomplete.autocomplete.getWrapper().style.display === "block") {
+          autocomplete.autocomplete.close();
+          autocomplete.autocomplete.open();
+        }
+      });
+    });
+
+    jQuery(document).on("click", ".algolia-powered-by-link", function (e) {
+      e.preventDefault();
+      window.location = "https://www.algolia.com/?utm_source=WordPress&utm_medium=extension&utm_content=" + window.location.hostname + "&utm_campaign=poweredby";
+    });
+  });
+</script>
+        </head>
+
+        <body class="post-template-default single single-post postid-43364 single-format-standard cookies-not-set">
+            <div id="wrapper" class="container multi">
+                                <header id="banner" class="row" role="banner">
+                    <div id="language_list"><ul><li><a href="https://blog.octo.com/en/"><img src="https://blog.octo.com/wp-content/plugins/sitepress-multilingual-cms/res/flags/en.png" height="12" alt="en" width="18" /></a></li><li><a href="https://blog.octo.com/pt-br/"><img src="https://blog.octo.com/wp-content/plugins/sitepress-multilingual-cms/res/flags/pt-br.png" height="12" alt="pt-br" width="18" /></a></li></ul></div>                    <div class="site-title">
+                        <a href="https://blog.octo.com/" class="site-title-link" rel="home" title="OCTO Talks !" >
+                            <img src="https://blog.octo.com/wp-content/themes/octotalks/images/logo-octo-talks.svg" alt="OCTO Talks !" class="site-title-image" />
+                        </a>
+                    </div>
+                </header>
+
+                <div class="row">
+                  <nav id="navigation" role="navigation" class="container navigation clearfix affix-top">
+                    <a class="skip-link screen-reader-text visuallyhidden" href="#content">Aller au contenu de la page</a>
+                    <div class="menu-navigation-container"><ul id="menu-navigation" class="menu"><li id="menu-item-50772" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-50772"><a href="https://blog.octo.com/category/management-de-si/">Stratégie SI</a></li>
+<li id="menu-item-50767" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-50767"><a href="https://blog.octo.com/category/architecture-et-technologies/">archi &#038; techno</a></li>
+<li id="menu-item-50771" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-50771"><a href="https://blog.octo.com/category/methodologie-et-conduite-du-changement/">Méthode</a></li>
+<li id="menu-item-50769" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-50769"><a href="https://blog.octo.com/category/digitalisation/">Digitalisation</a></li>
+<li id="menu-item-50768" class="menu-item menu-item-type-taxonomy menu-item-object-category current-post-ancestor current-menu-parent current-post-parent menu-item-50768"><a href="https://blog.octo.com/category/big-data/">Big Data</a></li>
+<li id="menu-item-50770" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-50770"><a href="https://blog.octo.com/category/actualite/">Évènement</a></li>
+</ul></div>                  </nav>
+                </div>
+
+                <div id="wrapper-inner" class="clearfix">
+
+
+<div id="content" class="col-md-8 col-lg-9">
+    <main id="main" role="main">
+
+<article id="post-43364" class="post-43364 post type-post status-publish format-standard hentry category-architecture-et-technologies category-big-data tag-machine-learning-fr tag-map-reduce tag-python">
+    <header class="post-header clearfix">
+        <div class="post-title">
+            <h1 class="post-heading page-heading">
+                Apprentissage distribué avec Spark            </h1>
+            <div class='post-meta entry-meta'>
+                Posté le <time datetime='2013-10-11T15:47:35+02:00'>11/10/2013</time>                par <span class='author'><a href='https://blog.octo.com/author/matthieu-lagacherie-mlg/'>Matthieu Lagacherie</a></span>            </div>
+        </div>
+    </header>
+    <div class="entry-content content-article">
+        <div class="sharify-container"><ul><li class="sharify-btn-twitter">
+								<a title="Tweet on Twitter" href="https://twitter.com/intent/tweet?text=Apprentissage+distribu%C3%A9+avec+Spark: https://blog.octo.com/apprentissage-distribue-avec-spark/" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+									<span class="sharify-icon"><i class="sharify sharify-twitter"></i></span>
+									<span class="sharify-title">Tweet</span>
+								</a>
+							</li><li class="sharify-btn-facebook">
+								<a title="Share on Facebook" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fblog.octo.com%2Fapprentissage-distribue-avec-spark%2F" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+									<span class="sharify-icon"><i class="sharify sharify-facebook"></i></span>
+									<span class="sharify-title">Share</span>
+									<span class="sharify-count">0</span>
+								</a>
+							</li><li class="sharify-btn-gplus">
+								<a title="Share on Google+" href="http://plus.google.com/share?url=https://blog.octo.com/apprentissage-distribue-avec-spark/" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+									<span class="sharify-icon"><i class="sharify sharify-gplus"></i></span>
+									<span class="sharify-title">+1</span>
+								</a>
+							</li><li class="sharify-btn-linkedin">
+								<a title="Share on Linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://blog.octo.com/apprentissage-distribue-avec-spark/&title=Apprentissage distribué avec Spark" onclick="if(!document.getElementById('td_social_networks_buttons')){window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;}" >
+									<span class="sharify-icon"><i class="sharify sharify-linkedin"></i></span>
+									<span class="sharify-title">LinkedIn</span>
+									<span class="sharify-count">0</span>
+								</a>
+							</li></ul></div><p><script src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script><script type="text/javascript">// <![CDATA[
+init_mathjax = function() {     if (window.MathJax) {         // MathJax loaded         MathJax.Hub.Config({             tex2jax: {                 inlineMath: [ ['$','$'], ["\\(","\\)"] ],                 displayMath: [ ['$$','$$'], ["\\[","\\]"] ]             },             displayAlign: 'left', // Change this to 'center' to center equations.             "HTML-CSS": {                 styles: {'.MathJax_Display': {"margin": 0}}             }         });         MathJax.Hub.Queue(["Typeset",MathJax.Hub]);     } } init_mathjax();
+// ]]&gt;</script></p>
+<p>Les solutions <em>big data</em> actuelles se concentrent essentiellement sur l&rsquo;aspect <a title="ETL" href="http://fr.wikipedia.org/wiki/Extract_Transform_Load">ETL</a> des traitements. Le modèle <a title="MapReduce" href="http://fr.wikipedia.org/wiki/MapReduce"><em>MapReduce</em></a> nous permet d&rsquo;implémenter facilement des extractions d&rsquo;informations mais de nombreuses contraintes et limitations apparaissent lors de la conception d&rsquo;algorithmes de <em>data science. </em></p>
+<p>Par exemple, les algorithmes itératifs couramment utilisés en <em>machine learning</em> sont difficilement intégrables dans les modèles <em>MapReduce: </em> le haut-niveau d&rsquo;intéraction des données impose une gestion et une synchronisation complexe à différentes phases de l&rsquo;analyse.</p>
+<p>Dans cet article nous nous intéressons à un <em>use case</em> typique en <em>machine learning: </em>la conception d&rsquo;un modèle d&rsquo;extraction et d&rsquo;analyse de texte permettant leur classification. Dans ce cadre nous utilisons un modèle classique: la régression logistique. Notre objectif est de démontrer l&rsquo;adaptation et l&rsquo;élégance d&rsquo;implémentation de ces algorithmes en utilisant le <em>framework</em> de calcul distribué <a title="Spark Project" href="http://spark.incubator.apache.org/">Spark</a>.</p>
+<p><span id="more-43364"></span></p>
+<h2>Use case</h2>
+<p>Une banque d&rsquo;investissement souhaite classer automatiquement les nouvelles financières en fonction de leur contenu. Pour cela elle dispose d&rsquo;un historique de plusieurs années sur l&rsquo;ensemble de marchés mondiaux manuellement catégorisée.</p>
+<p>L&rsquo;objectif est ici de construire une architecture permettant:</p>
+<ol>
+<li>Le pré-traitement des news en un format utilisable en <em>machine learning</em>.</li>
+<li>La création d&rsquo;un modèle permettant la catégorisation automatique en fonction du contenu des nouvelles.</li>
+<li>La classification en temps réel.</li>
+</ol>
+<p>Nous allons ici nous concentrer sur le second point.</p>
+<p>&nbsp;</p>
+<h2>Données</h2>
+<p>Pour illustrer cette étude nous nous basons sur le <em>dataset</em> <a href="http://jmlr.org/papers/volume5/lewis04a/lyrl2004_rcv1v2_README.htm">RCV1-v2/LYRL2004</a> extrait du <em>Reuters Corpus Volume 1</em>, une archive de 800 000 nouvelles financières manuellement catégorisées. Ce <em>dataset</em> est pré-traité (suppression des <em>stop words</em> et <em>stemming</em>) et se présente directement sous la forme de matrices de termes par documents.</p>
+<p>Afin de pouvoir alimenter un algorithme d&rsquo;apprentissage, nous procédons à l&rsquo;extraction des caractéristiques <a href="http://fr.wikipedia.org/wiki/TF-IDF" target="_blank">TF/IDF</a> qui offrent une interprétation fréquentiste des textes. La tâche d&rsquo;apprentissage est de prédire les articles appartenant à la catégorie CCAT (Corporate/Industrial).</p>
+<p>Pour résumer, notre modèle devra répondre à la question: <strong>cette nouvelle est-elle de type Corporate/Industrial ?</strong></p>
+<p>Nous sommes donc dans le cadre d&rsquo;un problème de <strong>classification binaire</strong>.</p>
+<p>&nbsp;</p>
+<h3>Calcul du TF-IDF</h3>
+<p>La mesure TF-IDF (Term Frequency &#8211; Inverse Document Frequency) permet d&rsquo;évaluer l&rsquo;importance d&rsquo;un mot dans un document relativement à l&rsquo;ensemble des documents.</p>
+<p><a href="https://blog.octo.com/wp-content/uploads/2013/10/tfidf_blg.png"><img class="alignnone  wp-image-43626" src="https://blog.octo.com/wp-content/uploads/2013/10/tfidf_blg-1024x295.png" alt="tfidf_blg" width="538" height="155" srcset="https://blog.octo.com/wp-content/uploads/2013/10/tfidf_blg-1024x295.png 1024w, https://blog.octo.com/wp-content/uploads/2013/10/tfidf_blg-300x87.png 300w, https://blog.octo.com/wp-content/uploads/2013/10/tfidf_blg-160x46.png 160w" sizes="(max-width: 538px) 100vw, 538px" /></a></p>
+<p>Avec les formules suivantes:</p>
+<p><a href="https://blog.octo.com/wp-content/uploads/2013/10/tf1.png"><img class="alignnone size-full wp-image-43629" src="https://blog.octo.com/wp-content/uploads/2013/10/tf1.png" alt="tf" width="190" height="46" srcset="https://blog.octo.com/wp-content/uploads/2013/10/tf1.png 190w, https://blog.octo.com/wp-content/uploads/2013/10/tf1-160x39.png 160w" sizes="(max-width: 190px) 100vw, 190px" /></a></p>
+<p><a href="https://blog.octo.com/wp-content/uploads/2013/10/idf1.png"><img class="alignnone size-full wp-image-43630" src="https://blog.octo.com/wp-content/uploads/2013/10/idf1.png" alt="idf" width="249" height="46" srcset="https://blog.octo.com/wp-content/uploads/2013/10/idf1.png 249w, https://blog.octo.com/wp-content/uploads/2013/10/idf1-160x30.png 160w" sizes="(max-width: 249px) 100vw, 249px" /></a></p>
+<p>L&rsquo;extraction du TF-IDF engendre un nombre très important de dimensions: une mesure pour chaque mot apparaissant dans le corpus et ce pour chaque document.</p>
+<p>Nous obtenons une matrice de 800 000 documents x 47 152 dimensions. Cette matrice est creuse (i.e. essentiellement constituée de 0), nous avons donc ici un moyen d&rsquo;optimiser le stockage et les calculs associés à cette matrice.</p>
+<p>Nous obtenons les caractéristiques suivantes:</p>
+<ul>
+<li>Nombre de dimensions: 47 152</li>
+<li>Nombre d&rsquo;exemples d&rsquo;apprentissage: 781 265</li>
+<li>Nombre d&rsquo;exemples de test: 23 149</li>
+</ul>
+<p>Dans l&rsquo;image ci-dessous, un extrait du <em>dataset</em> illustrant la distribution des valeurs non-nulles.</p>
+<p><a href="https://blog.octo.com/wp-content/uploads/2013/10/map_legend_2.png"><img class="alignnone  wp-image-43643" src="https://blog.octo.com/wp-content/uploads/2013/10/map_legend_2-1024x942.png" alt="map_legend_2" width="657" height="604" srcset="https://blog.octo.com/wp-content/uploads/2013/10/map_legend_2-1024x942.png 1024w, https://blog.octo.com/wp-content/uploads/2013/10/map_legend_2-300x276.png 300w, https://blog.octo.com/wp-content/uploads/2013/10/map_legend_2-160x147.png 160w, https://blog.octo.com/wp-content/uploads/2013/10/map_legend_2.png 1206w" sizes="(max-width: 657px) 100vw, 657px" /></a></p>
+<div tabindex="-1">
+<h2></h2>
+<h2>Régression logistique</h2>
+</div>
+<div tabindex="2">
+<div tabindex="-1">
+<p>Nous utilisons un modèle de régression logistique pour classer les nouvelles appartenant à la catégorie CCAT. C&rsquo;est un modèle classique pour les problèmes de classification binaire (cf <a href="http://fr.wikipedia.org/wiki/R%C3%A9gression_logistique" target="_blank">Wikipedia</a>).</p>
+<p>L&rsquo;important est de comprendre que notre modèle est paramétré par un vecteur de poids w. L&rsquo;algorithme permettant d&rsquo;optimiser ces paramètres est une descente de gradient, <strong>nous avons donc besoin d&rsquo;exprimer le gradient de notre modèle par rapport à une fonction de coût</strong>.</p>
+<p>&nbsp;</p>
+</div>
+</div>
+<h3 id="modèle">Modèle</h3>
+<p>Le modèle logistique avec un vecteur d&rsquo;entrée xi et un vecteur de paramètres w:</p>
+<p><a href="https://blog.octo.com/wp-content/uploads/2013/10/logistic.png"><img class="alignnone size-full wp-image-43622" src="https://blog.octo.com/wp-content/uploads/2013/10/logistic.png" alt="logistic" width="163" height="46" srcset="https://blog.octo.com/wp-content/uploads/2013/10/logistic.png 163w, https://blog.octo.com/wp-content/uploads/2013/10/logistic-160x45.png 160w" sizes="(max-width: 163px) 100vw, 163px" /></a></p>
+<p>L&rsquo;implémentation en python de cette fonction.</p>
+<pre><code class='python'>def logistic(x, w):
+  return 1.0 / (1.0 + np.exp(-x.dot(w)))</code></pre>
+<p>&nbsp;</p>
+<p>L&rsquo;estimation de ce modèle utilise le <a href="http://fr.wikipedia.org/wiki/R%C3%A9gression_logistique#Estimation_.E2.80.94_Principe_du_maximum_de_vraisemblance">principe du maximum de vraisemblance</a>, nous utilisons donc le gradient de la vraisemblance pour la descente de gradient.</p>
+<pre><code class='python'>def logistic_gradient(x, y, w): 
+  return (x.T * ((1.0 / (1.0 + np.exp(-x.dot(w)))) - y)).sum(1)</code></pre>
+<p>&nbsp;</p>
+<h3 id="apprentissage-par-descente-de-gradient">Apprentissage par descente de gradient</h3>
+<p>C&rsquo;est un algorithme classique en <em>machine learning</em>. Le principe est simple: la performance de notre modèle est optimisée via la mesure de son erreur sur chacun des exemples de l&rsquo;apprentissage. Nous dérivons cette mesure et mesurons ainsi l&rsquo;erreur associée à chacun des paramètres unitaires de notre modèle pour chacun des exemples (i.e. nous mesurons l&rsquo;influence du paramètre sur l&rsquo;erreur globale du modèle). Nous utilisons ensuite ces erreurs pour corriger itérativement notre modèle.</p>
+<p><strong>Le point important est de comprendre qu&rsquo;à une itération donnée, le calcul des erreurs pour chacun des couples paramètre/exemple est indépendant, ce qui nous permet une parallélisation naturelle.</strong></p>
+<p><strong>Dans notre implémentation, nous allons paralléliser le calcul des gradients et la somme de ces vecteurs de gradients.</strong></p>
+<p><a href="https://blog.octo.com/wp-content/uploads/2013/09/gradient1.png"><img class="alignnone  wp-image-43410" src="https://blog.octo.com/wp-content/uploads/2013/09/gradient1-1024x464.png" alt="Gradient" width="607" height="275" srcset="https://blog.octo.com/wp-content/uploads/2013/09/gradient1-1024x464.png 1024w, https://blog.octo.com/wp-content/uploads/2013/09/gradient1-300x136.png 300w, https://blog.octo.com/wp-content/uploads/2013/09/gradient1-160x73.png 160w, https://blog.octo.com/wp-content/uploads/2013/09/gradient1.png 1500w" sizes="(max-width: 607px) 100vw, 607px" /></a></p>
+<p>&nbsp;</p>
+<div>
+<h2></h2>
+<h2 id="apprentissage">Apprentissage</h2>
+<p>La phase d&rsquo;apprentissage du modèle consiste à itérer sur l&rsquo;ensemble du <em>dataset</em> en corrigant à chaque étape les paramètres afin de converger vers un taux de classification optimum.</p>
+</div>
+<div>
+<h3></h3>
+<h3 id="architecture">Architecture</h3>
+<p><a href="https://blog.octo.com/wp-content/uploads/2013/09/gradient_process.png"><img class="alignnone  wp-image-43372" src="https://blog.octo.com/wp-content/uploads/2013/09/gradient_process-1024x531.png" alt="gradient_process" width="586" height="304" /></a></p>
+<p>Les points importants de cette architecture:</p>
+<ol>
+<li>Le <em>dataset</em> est découpé et distribué sur les noeuds du cluster.</li>
+<li>Les paramètres sont envoyés à tout les noeuds à chaque nouvelle itération.</li>
+<li>L&rsquo;agrégation des gradients correspond à une phase <em>reduce</em>, donc opérée également en parallèle.</li>
+</ol>
+<div>
+<h3></h3>
+<h3 id="distribution-des-données">Distribution des données</h3>
+<p>Le premier traitement que nous appliquons est le découpage du <em>dataset</em> initial en blocs de données pré-traitées binaires. Les blocs représentent chacun un sous-ensemble du <em>dataset</em> de 1000 exemples directement stockés dans un format binaire gérant les matrices creuses (module <a title="SciPy Sparse" href="http://docs.scipy.org/doc/scipy/reference/sparse.html">SciPy scipy.sparse</a>).</p>
+</div>
+<div>
+<h3></h3>
+<h3 id="framework-spark">Framework Spark</h3>
+<p>Nous avons ici choisit d&rsquo;utiliser le framework <em>Spark</em> qui permet de représenter des problèmes de type <em>MapReduce</em> de manière concise et élégante. Développé au sein du <em>Apache incubator</em> dans le langage <em>Scala</em>, il est utilisé et supporté par de nombreuses sociétés impliquées dans le <em>big data</em>.</p>
+<p>L&rsquo;approche de <em>Spark</em> est résumée en une phrase:</p>
+<blockquote>
+<h3>Make data analytics fast &#8211; both fast to run and fast to write</h3>
+</blockquote>
+<p>Le <em>framework</em> se concentre sur le développement d&rsquo;algorithmes itératifs où la mise en cache et un haut niveau d’interaction des données est nécessaire. Une fois l&rsquo;algorithme développé avec l&rsquo;API <em>Spark</em>, la génération de code et le lancement des calculs sur une machine locale ou en distribué se fait de manière transparente.</p>
+<p>Spark facilite l&rsquo;implémentation de ce type d&rsquo;algorithme sans forcément exiger une architecture spécialisée. Il permet de s&rsquo;intégrer avec le modèle MapReduce classique et propose différents mode de <em>clustering</em>:</p>
+<ol>
+<li>Amazon EC2</li>
+<li>Standalone</li>
+<li>Apache Mesos</li>
+<li>Hadoop YARN</li>
+</ol>
+<p>Avec évidemment la possibilité de tester localement dans une version <em>multi-tread</em>.</p>
+<p>La force de ce <em>framework</em> est d&rsquo;abstraire l&rsquo;ensemble des opérations nécessaires à l&rsquo;adaptation de l&rsquo;algorithme à l&rsquo;une ou l&rsquo;autre de ces architectures. Le développeur ne travaille pas à l&rsquo;adaptation du code aux différentes topologies de cluster, il se concentre uniquement sur l&rsquo;algorithme.</p>
+<p>Ce <em>framework</em> propose des APIs en <a href="http://spark.incubator.apache.org/docs/latest/python-programming-guide.html">Python</a>, <a href="http://spark.incubator.apache.org/docs/latest/scala-programming-guide.html">Scala</a> et <a href="http://spark.incubator.apache.org/docs/latest/java-programming-guide.html">Java</a>.</p>
+<div>
+<h3></h3>
+<h3 id="implémentation">Implémentation</h3>
+</div>
+<div>
+<p>Nous utilisons l&rsquo;API Python du <em>framework Spark</em>. Nous avons souhaité utiliser ce langage car Python offre de nombreuses bibliothèques facilitant le calcul scientifique (dans notre cas SciPy et NumPy).</p>
+</div>
+<div>
+<h4 id="initialisation">Initialisation</h4>
+<p>Avant tout, nous importons les bibliothèques Python et <em>Spark</em> nécessaires à l&rsquo;algorithme:</p>
+<ul>
+<li>pyspark: importation de l&rsquo;API Spark. L&rsquo;objet SparkContext va gérer l&rsquo;ensemble des communications avec le cluster.</li>
+<li>scipy.sparse: importation du module de gestion des matrices creuses. Plusieurs formats de stockage sont disponibles, nous utilisons ici le format csc_matrix « Compressed Sparse Column matrix ».</li>
+<li>numpy: utilisé pour les opérations matricielles.</li>
+<li>sklearn.metrics: nous importons une fonction utilitaire nous permettant de calculer le nombre d&rsquo;exemples bien classés.</li>
+</ul>
+<p>&nbsp;</p>
+<pre><code class='python'>from pyspark import SparkContext, StorageLevel
+from scipy.sparse import csc_matrix
+import numpy as np
+from sklearn.metrics import accuracy_score
+from svmlightbin import binsplit_dataset_read
+from os.path import realpath</code></pre>
+<p>&nbsp;</p>
+<p>Nous initialisons ensuite un objet <em>SparkContext</em> qui centralise l&rsquo;ensemble des communications avec le cluster.</p>
+<pre><code class='python'>sc = SparkContext(&quot;local[8]&quot;, &quot;PythonLR&quot;, pyFiles=[realpath(&quot;spark.py&quot;)])</code></pre>
+<p>&nbsp;</p>
+<h4 id="initialisation">Algorithme</h4>
+<p>Nous pouvons ensuite implémenter l&rsquo;apprentissage de notre modèle.</p>
+<p><strong>1. </strong>Paramétrage de l&rsquo;apprentissage.</p>
+<ul>
+<li><span style="line-height: 12.997159004211426px;">NDIM: nombre de dimensions de notre <em>dataset</em>.</span></li>
+<li>ITERATIONS: itérations de la descente de gradient.</li>
+<li>NTRAINS, NTESTS: nombre de fichiers issus du pré-traitement du <em>dataset</em>.</li>
+</ul>
+<pre><code class='python'>NDIM = 47153
+ITERATIONS = 20
+NTRAINS = 1563
+NTESTS = 47</code></pre>
+<p>&nbsp;</p>
+<p><strong>2. </strong>Initialisation des traitements permettant de distribuer les différents calculs sur notre dataset.</p>
+<pre><code class='python'>train_files = sc.parallelize(xrange(NTRAINS))
+test_files = sc.parallelize(xrange(NTESTS)) 
+train_reader = lambda x: binsplit_dataset_read(&quot;train.txt&quot;, x)
+test_reader = lambda x: binsplit_dataset_read(&quot;test.txt&quot;, x)</code></pre>
+<p>&nbsp;</p>
+<p><strong>3. </strong>Un premier calcul Spark extrait le nombre d&rsquo;exemples de notre ensemble d&rsquo;apprentissage et de test.</p>
+<pre><code class='python'>train_nrows = train_files.map(lambda x: train_reader(x).shape[0]).sum()
+test_nrows = test_files.map(lambda x: test_reader(x).shape[0]).sum()</code></pre>
+<p>&nbsp;</p>
+<p><strong>4. </strong>Nous initialisons notre vecteur de paramètres w avec des valeurs aléatoires.</p>
+<pre><code class='python'>w = 2 * np.random.ranf((NDIM, 1)) - 1</code></pre>
+<p>&nbsp;</p>
+<p><strong>5.</strong> Nous créons un <strong>broadcast</strong> de cette valeur. C&rsquo;est une fonctionnalité de Spark, le broadcast permet de distribuer notre vecteur de paramètres w sur l&rsquo;ensemble des noeuds.</p>
+<pre><code class='python'>wb = sc.broadcast(w)</code></pre>
+<p>&nbsp;</p>
+<p><strong>6.</strong> Les fonctions utilisées par l&rsquo;apprentissage:</p>
+<ul>
+<li>La fonction <em>score</em> calculant le nombre d&rsquo;exemples correctement classés.</li>
+<li>La fonction <em>gradient</em> calculant le gradient pour un sous-ensemble d&rsquo;apprentissage et un vecteur de paramètres.</li>
+<li>La fonction <em>add</em> permettant d&rsquo;agréger les gradients.</li>
+</ul>
+<pre><code class='python'>def score(matrix, w):
+    Y = matrix[:,0]
+    X = matrix[:,1:]
+    pred = logistic(X, w)
+    return accuracy_score(Y &gt; 0.5, pred &gt; 0.5, normalize=False)
+
+def gradient(matrix, w):
+    Y = matrix[:,0]
+    X = matrix[:,1:]
+    return logistic_gradient(X, Y, w)
+
+def add(x, y):
+    x += y
+    return x</code></pre>
+<p>&nbsp;</p>
+<p><strong>7.</strong> Nous avons ensuite l&rsquo;itération de l&rsquo;apprentissage dont le rôle est de calculer les gradients, les agréger et les appliquer au vecteur de paramètres w.</p>
+<pre><code class='python'>for i in range(ITERATIONS):
+    # nous retrouvons ici le pattern typique MapReduce
+    # map: calcul des gradients pour chaque exemple
+    # reduce: aggr&eacute;gation des gradients
+    grad_sum = train_files.map(lambda x: gradient(train_reader(x).todense(), wb.value)).reduce(add)
+    w -= 0.1 * grad_sum
+    wb = sc.broadcast(w)
+    train_nsc = train_files.map(lambda x: score(train_reader(x).todense(), wb.value)).reduce(add)
+    test_nsc = test_files.map(lambda m: score(test_reader(m).todense(), wb.value)).reduce(add)
+    print &quot;Train Score&quot;, i, train_nsc / float(train_nrows), &quot;Test Score&quot;, test_nsc / float(test_nrows)</code></pre>
+<h2></h2>
+<h4 id="initialisation">Résultats</h4>
+<p>Après 10 itérations nous obtenons les scores suivants:</p>
+<ul>
+<li><span style="font-size: 13px; line-height: 19px;">Erreur sur le <em>dataset</em> d&rsquo;apprentissage 7.5 %.</span></li>
+<li><span style="font-size: 13px; line-height: 19px;">Erreur sur le <em>dataset</em> de test 8 %.</span></li>
+</ul>
+<p>Ces scores sont légèrement moins bons que les résultats obtenus via SVM dans la littérature [SVM] (erreur de test ~6%), mais restent néanmoins cohérent avec notre approche dans laquelle nous n&rsquo;avons pas affiné l&rsquo;algorithme de descente de gradient. En particulier notre pas d&rsquo;apprentissage est fixé à 0.1 et n&rsquo;évolue pas au cours de l&rsquo;apprentissage.</p>
+<p>&nbsp;</p>
+<h2>Autres fonctionnalités de Spark</h2>
+<h3 id="data-caching">Data caching</h3>
+<p><em>Spark</em> offre des fonctionalités avancées permettant de mettre en cache des résultats intermédiaires afin d&rsquo;accélérer les calculs. Nous avons pu tester ces fonctions sur des extraits du <em>dataset</em> mais nous avons eu des difficultés de réglage de la JVM sur le <em>dataset</em> complet.</p>
+<h3 id="spark-streaming">Spark streaming</h3>
+<p>Malheureusement <em>Spark streaming</em> n&rsquo;est pas disponible dans l&rsquo;API <em>Python</em>. Cette fonctionnalité permet d&rsquo;utiliser le <em>framework Spark</em> sur des <em>streams</em> en temps réel.</p>
+<p>Avec Spark Streaming notre algorithme pourrait-être déployé en temps réel sans modifications du code: il serait lancé sur des <em>mini-batchs</em> de données.</p>
+<p>&nbsp;</p>
+<h3 id="spark-streaming">Spark MLLib</h3>
+<p>Depuis la version 0.8 (sortie fin septembre), Spark intègre la librairie <a href="http://spark.incubator.apache.org/docs/latest/mllib-guide.html">MLLib</a> qui propose une implémentation de plusieurs algorithmes de <em>machine learning</em>:</p>
+<ul>
+<li>SVM linéaires</li>
+<li>Regression logistique</li>
+</ul>
+<p>Cette librairie n&rsquo;est pour l&rsquo;instant disponible qu&rsquo;à partir de l&rsquo;API Scala.</p>
+<p>&nbsp;</p>
+<h1 id="discussion">Conclusion</h1>
+<p>Cet article illustre l&rsquo;apport des <em>frameworks</em> haut niveau dans l&rsquo;implémentation d&rsquo;algorithmes type de <em>machine learning</em>:</p>
+<ol>
+<li>Une API qui permet de s&rsquo;abstraire de la couche d&rsquo;exécution.</li>
+<li>Des fonctionalités permettant de simplifier des processus complexes, par exemple le <em>broadcast</em>.</li>
+<li>Des mécanismes facilitant l&rsquo;implémentation d&rsquo;algorithmes itératifs.</li>
+<li>Une intégration dans les architectures Hadoop existantes.</li>
+</ol>
+<p>Cependant ce <em>framework</em> reste encore jeune sur certains points:</p>
+<ul>
+<li><span style="line-height: 13px;">L&rsquo;API Python est incomplète et ne propose pas l&rsquo;ensemble des fonctionnalités.</span></li>
+<li>Le mécanisme de <em>data caching</em> est complexe à mettre en oeuvre et impose un réglage fin de la JVM.</li>
+<li>La documentation manque de précisions sur des parties techniques telles que le <em>data caching</em>.</li>
+<li>L&rsquo;API est difficile à debuguer.</li>
+</ul>
+<p>&nbsp;</p>
+<h2> Références</h2>
+<p>[SVM] Léon Bottou: Large-Scale Machine Learning with Stochastic Gradient Descent, Proceedings of the 19th International Conference on Computational Statistics (COMPSTAT&rsquo;2010), 177–187, Edited by Yves Lechevallier and Gilbert Saporta, Paris, France, August 2010, Springer.</p>
+<p><a href="http://spark.incubator.apache.org/">Projet Spark</a></p>
+<p><a href="http://jmlr.org/papers/volume5/lewis04a/lyrl2004_rcv1v2_README.htm">Dataset RCV1-v2/LYRL2004</a></p>
+</div>
+</div>
+</div>
+<div class="sharify-container"><ul><li class="sharify-btn-twitter">
+								<a title="Tweet on Twitter" href="https://twitter.com/intent/tweet?text=Apprentissage+distribu%C3%A9+avec+Spark: https://blog.octo.com/apprentissage-distribue-avec-spark/" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+									<span class="sharify-icon"><i class="sharify sharify-twitter"></i></span>
+									<span class="sharify-title">Tweet</span>
+								</a>
+							</li><li class="sharify-btn-facebook">
+								<a title="Share on Facebook" href="http://www.facebook.com/sharer.php?u=https%3A%2F%2Fblog.octo.com%2Fapprentissage-distribue-avec-spark%2F" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+									<span class="sharify-icon"><i class="sharify sharify-facebook"></i></span>
+									<span class="sharify-title">Share</span>
+									<span class="sharify-count">0</span>
+								</a>
+							</li><li class="sharify-btn-gplus">
+								<a title="Share on Google+" href="http://plus.google.com/share?url=https://blog.octo.com/apprentissage-distribue-avec-spark/" onclick="window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;">
+									<span class="sharify-icon"><i class="sharify sharify-gplus"></i></span>
+									<span class="sharify-title">+1</span>
+								</a>
+							</li><li class="sharify-btn-linkedin">
+								<a title="Share on Linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=https://blog.octo.com/apprentissage-distribue-avec-spark/&title=Apprentissage distribué avec Spark" onclick="if(!document.getElementById('td_social_networks_buttons')){window.open(this.href, 'mywin','left=50,top=50,width=600,height=350,toolbar=0'); return false;}" >
+									<span class="sharify-icon"><i class="sharify sharify-linkedin"></i></span>
+									<span class="sharify-title">LinkedIn</span>
+									<span class="sharify-count">0</span>
+								</a>
+							</li></ul></div>    </div>
+    <footer class="entry-meta">
+        Cet article a été posté dans <a href="https://blog.octo.com/category/architecture-et-technologies/" rel="category tag">Archi &amp; techno</a>, <a href="https://blog.octo.com/category/big-data/" rel="category tag">Big Data</a> et taggué <a href="https://blog.octo.com/tag/machine-learning-fr/" rel="tag">machine learning</a>, <a href="https://blog.octo.com/tag/map-reduce/" rel="tag">Map Reduce</a>, <a href="https://blog.octo.com/tag/python/" rel="tag">Python</a>.    </footer>
+</article>
+<aside class="recent-posts">
+    		<div class="widget widget_recent_entries">		<h2 class="widgettitle">Articles récents</h2>		<ul>
+											<li>
+					<a href="https://blog.octo.com/aws-qldb-ou-comment-eviter-de-creer-votre-blockchain-privee/">AWS QLDB ou comment éviter de créer votre blockchain privée</a>
+									</li>
+											<li>
+					<a href="https://blog.octo.com/algorithmes-evolutionnistes-applications-a-des-problemes-de-donnees-2/">Algorithmes Évolutionnistes : Applications à des problèmes de données – 2</a>
+									</li>
+											<li>
+					<a href="https://blog.octo.com/interview-wojciech-wojcik-on-ne-nait-pas-tech-lead-on-le-devient/">Interview Wojciech Wojcik « On ne naît pas Tech Lead, on le devient ! »</a>
+									</li>
+											<li>
+					<a href="https://blog.octo.com/culture-innov-panorama-des-lieux-dinnovation/">Culture Innov&rsquo; : Panorama des lieux d&rsquo;innovation</a>
+									</li>
+											<li>
+					<a href="https://blog.octo.com/ethical-by-design-le-veritable-enjeu-de-lia/">« Ethical by Design », le véritable enjeu de l’IA</a>
+									</li>
+					</ul>
+		</div></aside><div id="comments" class="comments-area">
+    <div class="comment-wrapper">
+        <script type="text/javascript">
+            jQuery(document).ready(function() {
+                var commentform = jQuery("#commentform");
+                commentform.on("click", "#submit-comment", function(e) {
+                    if(commentform[0].checkValidity()) {
+                        e.preventDefault();
+                        grecaptcha.execute();
+                    }
+                });
+            });
+
+            function submitCommentForm(data) {
+                document.getElementById("commentform").submit();
+            }
+        </script>
+
+        <h2 class='comments-title'>Un commentaire sur &ldquo;Apprentissage distribué avec Spark&rdquo;</h2><li id="comment-13355" class="comment even thread-even depth-1">
+    <div class="comment-body">
+        <div class="comment-meta">
+            <div class="comment-pic">
+                <img alt='' src='https://secure.gravatar.com/avatar/c0a16cd943163d3f19a63c12ffeebef2?s=42&#038;d=mm&#038;r=g' srcset='https://secure.gravatar.com/avatar/c0a16cd943163d3f19a63c12ffeebef2?s=84&#038;d=mm&#038;r=g 2x' class='avatar avatar-42 photo' height='42' width='42' />            </div>
+            <div class="comment-metadata">
+                <cite class="fn">Sam Bessalah</cite> <span class="waiting"></span>
+                <br>
+                <time datetime="2013-10-11T16:58:36+02:00">11/10/2013 à 16:58</time>
+                            </div>
+        </div>
+        <div class="comment-content">
+            Merci pour ce poste tres riche.
+La partie pre-processing, feature extraction est possible grace à MLI, qui est une interface de machine learning un peu comme sk-learn, qui s'interface à MLLib (gothub.com/amplab/mli )
+D'ailleur le meme exemple peut etre trouvé en utilisant un SVM ici lors du Ampcamp 
+http://ampcamp.berkeley.edu/3/exercises/mli-document-categorization.html .        </div>
+                </div>
+</li></li><!-- #comment-## -->
+<ol class='comment-list'></ol>	<div id="respond" class="comment-respond">
+		<h3 id="reply-title" class="comment-reply-title">Laisser un commentaire <small><a rel="nofollow" id="cancel-comment-reply-link" href="/apprentissage-distribue-avec-spark/#respond" style="display:none;">Annuler la réponse</a></small></h3>			<form action="https://blog.octo.com/wp-comments-post.php?wpe-comment-post=octotalks" method="post" id="commentform" class="comment-form">
+				<p class="comment-notes"><span id="email-notes">Votre adresse de messagerie ne sera pas publiée.</span> Les champs obligatoires sont indiqués avec <span class="required">*</span></p><p class="comment-form-comment"><label for="comment">Commentaire</label> <textarea id="comment" name="comment" cols="45" rows="8" maxlength="65525" required="required"></textarea></p><input name="wpml_language_code" type="hidden" value="fr" /><p style="clear: both;" class="subscribe-to-comments">
+			<input type="checkbox" name="subscribe" id="subscribe" value="subscribe" style="width: auto;" />
+			<label for="subscribe">Me notifier par mail en cas de nouveaux commentaires</label>
+			</p><p class="comment-form-author"><label for="author">Nom <span class="required">*</span></label> <input id="author" name="author" type="text" value="" size="30" maxlength="245" required='required' /></p>
+<p class="comment-form-email"><label for="email">Adresse de messagerie <span class="required">*</span></label> <input id="email" name="email" type="text" value="" size="30" maxlength="100" aria-describedby="email-notes" required='required' /></p>
+<p class="comment-form-url"><label for="url">Site web</label> <input id="url" name="url" type="text" value="" size="30" maxlength="200" /></p>
+<div class="form-submit"><div data-callback="submitCommentForm" data-sitekey="6LeqxiAUAAAAACEEl3Idz78Mjrr4VBW9QoPDAK_x" class="g-recaptcha" data-size="invisible" data-badge="inline"></div><button id="submit-comment">Laisser un commentaire</button><br><span class="small-recaptcha-msg">Ce formulaire est protégé par <a href="https://www.google.com/intl/fr/policies/" rel="nofollow external">Google Recaptcha</a></span> <input type='hidden' name='comment_post_ID' value='43364' id='comment_post_ID' />
+<input type='hidden' name='comment_parent' id='comment_parent' value='0' />
+</div>			</form>
+			</div><!-- #respond -->
+	    </div>
+</div>
+    </main>
+</div> <!-- #content closing -->
+
+
+<div id="aside" class="col-md-4 col-lg-3">
+    <div class="sidebar-item sidebar-search">
+<form role="search" method="get" class="search-form" id="searchform" action="https://blog.octo.com/">
+    <input type="search" name="s" class="search-field" placeholder="Rechercher" id="search-field" />
+    <button type="submit" class="search-submit">
+        <p class="picto-search">
+            Chercher        </p>
+    </button>
+</form>
+</div>
+
+    <p class="sidebar-startups-text">Les start-ups incubées chez OCTO :</p>
+    <!-- BEGIN academy -->
+    <div class="sidebar-item sidebar-octo-academy">
+      <a href="http://www.octo.academy" rel="external" class="sidebar-link sidebar-octo-academy-logo" title="Appaloosa, App Store d’entreprise">
+          <img src="https://blog.octo.com/wp-content/themes/octotalks/images/logo-octo-academy.png" alt="Appaloosa, App Store d’entreprise" class="sidebar-image">
+      </a>
+                  <p class="sidebar-octo-academy-title">Les prochaines formations :</p>
+          <ol id="sidebar-octo-academy-links">
+              <li><a href='https://www.octo.academy/fr/formation/267-industrialisation-d-un-projet-de-data-science' class='sidebar-octo-academy-link' rel='external'>Industrialisation d&#039;un projet de Data Science</a></li><li><a href='https://www.octo.academy/fr/formation/171-analyse-de-donnees-pour-hadoop-2-x-hortonworks-avec-pig-et-hive' class='sidebar-octo-academy-link' rel='external'>Analyse de données pour Hadoop 2.X Hortonworks avec Pig et Hive</a></li><li><a href='https://www.octo.academy/fr/formation/182-ios-avance-architecture-et-testabilite' class='sidebar-octo-academy-link' rel='external'>iOS avancé : architecture et testabilité</a></li><li><a href='https://www.octo.academy/fr/formation/188-chatbot-creer-son-agent-conversationnel' class='sidebar-octo-academy-link' rel='external'>Chatbot : créer son agent conversationnel</a></li><li><a href='https://www.octo.academy/fr/formation/218-animer-une-retrospective-projet' class='sidebar-octo-academy-link' rel='external'>Animer une rétrospective projet</a></li>          </ol>
+            </div>
+    <!-- END academy -->
+
+    <!-- BEGIN appaloosa -->
+    <div class="sidebar-item sidebar-appaloosa">
+        <p>
+            <a href="https://www.appaloosa-store.com/" title="Appaloosa, App Store d’entreprise" class="sidebar-link sidebar-appaloosa-link">
+                <img src="https://blog.octo.com/wp-content/themes/octotalks/images/logo-appaloosa.svg" alt="Appaloosa, App Store d’entreprise" class="sidebar-image sidebar-appaloosa-image">
+            </a>
+        </p>
+                    <p>Suivez l’aventure sur <a href="https://medium.com/@appaloosastore" rel="external">leur blog</a></p>
+            </div>
+    <!-- END appaloosa -->
+
+            <a href="https://www.laduckconf.com/" rel="external" class="sidebar-item sidebar-book sidebar-duck-conf clearfix">
+            <img src="https://blog.octo.com/wp-content/themes/octotalks/images/bandeau_droite_blog-04.png" alt="www.laduckconf.com" class="sidebar-image sidebar-duck-conf-image">
+            <span class="sidebar-book-content">
+                <strong class="sidebar-text sidebar-text2">www.laduckconf.com</strong>
+                <span class="sidebar-text sidebar-text3"></span>
+          </span>
+        </a>
+            <a href="https://rejoins.octo.com/" rel="external" class="sidebar-item sidebar-book sidebar-octo-recrute clearfix">
+            <img src="https://blog.octo.com/wp-content/themes/octotalks/images/bandeau_droite_blog-05.png" alt="" class="sidebar-image sidebar-octo-recrute-image">
+            <span class="sidebar-book-content">
+                <strong class="sidebar-text sidebar-text2"></strong>
+                <span class="sidebar-text sidebar-text3"></span>
+          </span>
+        </a>
+    
+    <!-- BEGIN usi -->
+    <!-- <div class="sidebar-item sidebar-usi">
+      <a href="http://www.usievents.com/" rel="external" class="sidebar-link sidebar-usi-link" title="L’USI : la conférence de référence sur la transformation digitale">
+          <img src="https://blog.octo.com/wp-content/themes/octotalks/images/usi2019.png" alt="L’USI : la conférence de référence sur la transformation digitale" class="sidebar-image sidebar-usi-image" /></a>
+        <p>
+            Plus d'informations sur le site de la <a href='http://www.usievents.com' target='_blank'>conférence USI Events</a>
+        </p>
+        <p>
+            Retrouvez toute l'actu de nos speakers et de l'évènement sur notre blog <a href='https://blog.usievents.com/' target='_blank'>Stay inspired</a>
+        </p>
+    </div> -->
+    <!-- END usi -->
+
+
+
+    <p class="sidebar-books-text">Nos livres blancs :</p>
+            <a href="https://www.octo.com/publications/33-culture-devops-vol-02/" rel="external" class="sidebar-item sidebar-book sidebar-culture-devops-vol-01 clearfix">
+            <img src="https://blog.octo.com/wp-content/themes/octotalks/images/bandeau_droite_blog-01.png" alt="Culture DevOps 2" class="sidebar-image sidebar-culture-devops-vol-01-image">
+            <span class="sidebar-book-content">
+                <strong class="sidebar-text sidebar-text2">Culture DevOps 2</strong>
+                <span class="sidebar-text sidebar-text3">Guide de survie dans la jungle technologique</span>
+          </span>
+        </a>
+            <a href="https://www.octo.com/publications/culture-code/" rel="external" class="sidebar-item sidebar-book sidebar-culture-code clearfix">
+            <img src="https://blog.octo.com/wp-content/themes/octotalks/images/bandeau_droite_blog-02.png" alt="Culture Code" class="sidebar-image sidebar-culture-code-image">
+            <span class="sidebar-book-content">
+                <strong class="sidebar-text sidebar-text2">Culture Code</strong>
+                <span class="sidebar-text sidebar-text3">Software Craftsmanship : Better places with better code</span>
+          </span>
+        </a>
+            <a href="https://www.octo.com/publications/pour-une-roadmap-produit/" rel="external" class="sidebar-item sidebar-book sidebar-roadmap-produit clearfix">
+            <img src="https://blog.octo.com/wp-content/themes/octotalks/images/bandeau_droite_blog-03.png" alt="Roadmap Produit" class="sidebar-image sidebar-roadmap-produit-image">
+            <span class="sidebar-book-content">
+                <strong class="sidebar-text sidebar-text2">Roadmap Produit</strong>
+                <span class="sidebar-text sidebar-text3">Et si elle devenait une direction plutôt qu’un plan établi ?</span>
+          </span>
+        </a>
+    </div>
+
+</div>
+<section id="links" class="row">
+    <nav role="navigation">
+        <ul class="ul-1 clearfix">
+            <li class="li-1">
+                <p class="heading"><a rel="external" href="http://www.octo.com/fr/pourquoi-octo">Nous connaître</a></p>
+                <ul class="ul-2">
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/pourquoi-octo">Pourquoi OCTO ?</a></li>
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/ou-nous-trouver">Où trouver OCTO ?</a></li>
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/nos-produits">Nos produits</a></li>
+                                            <li class="li-2"><a rel="external" href="http://www.octo.com/fr/partenaires">Nos partenaires</a></li>
+                                        <li class="li-2"><a rel="external" href="http://www.octo.com/fr/investisseurs">Investisseurs</a></li>
+                </ul>
+            </li>
+            <li class="li-1">
+                <p class="heading"><a rel="external" href="http://www.octo.com/fr/ce-que-nous-faisons">Notre mission</a></p>
+                <ul class="ul-2">
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/ce-que-nous-faisons">Ce que nous faisons</a></li>
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/comment-nous-le-faisons">Comment nous le faisons</a></li>
+                                            <li class="li-2"><a rel="external" href="http://www.octo.com/fr/publications">Publications</a></li>
+                        <li class="li-2"><a rel="external" href="http://www.octo.com/fr/evenements">Évènements</a></li>
+                        <li class="li-2"><a rel="external" href="http://www.octo.academy">OCTO Academy</a></li>
+                                    </ul>
+            </li>
+            <li class="li-1">
+                <p class="heading"><a rel="external" href="http://rejoins.octo.com/">Nous rejoindre</a></p>
+                <ul class="ul-2">
+                    <li class="li-2"><a rel="external" href="http://rejoins.octo.com/">OCTO Recrute !</a></li>
+                    <li class="li-2"><a rel="external" href="http://www.welcometothejungle.co/companies/octo-technology">Découvrez OCTO de l'intérieur</a></li>
+                    <li class="li-2"><a rel="external" href="http://rejoins.octo.com/tribes">Nos tribus</a></li>
+                </ul>
+            </li>
+            <li class="li-1">
+                <p class="heading">International</p>
+                <ul class="ul-2">
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/">Paris</a></li>
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/international/rabat">Rabat</a></li>
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/international/lausanne">Lausanne</a></li>
+                    <li class="li-2"><a rel="external" href="http://www.octo.com/fr/international/sydney">Sydney</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</section>
+<footer id="contentinfo" class="row" role="contentinfo">
+    <a href="http://www.octo.com" title="OCTO Technology" class="octo-logo">OCTO Technology<br>Part of Accenture Digital</a>
+    <ul class="countries">
+        <li><a rel="external" href="http://www.octo.com/fr/">Paris</a></li>
+        <li><a rel="external" href="http://www.octo.com/fr/international/rabat">Rabat</a></li>
+        <li><a rel="external" href="http://www.octo.com/fr/international/lausanne">Lausanne</a></li>
+        <li><a rel="external" href="http://www.octo.com/fr/international/sydney">Sydney</a></li>
+    </ul>
+    <address>
+        <ul>
+            <li>Siège:</li>
+            <li class="street-address">34 avenue de l'Opéra,</li>
+            <li class="locality">75002 Paris, </li>
+            <li class="country">France</li>
+            <li class="tel">+33 (0)1 58 56 10 00</li>
+        </ul>
+    </address>
+    <ul class="links">
+        <li><a href="http://www.octo.com" class="contact_request_button">Contact</a></li>
+        <li><a href="http://www.octo.com/fr/mentions-legales">Mentions legales</a></li>
+    </ul>
+</footer>
+
+</div>
+
+<script type='text/javascript'>
+/* <![CDATA[ */
+var cnArgs = {"ajaxurl":"https:\/\/blog.octo.com\/wp-admin\/admin-ajax.php","hideEffect":"fade","onScroll":"no","onScrollOffset":"100","cookieName":"cookie_notice_accepted","cookieValue":"true","cookieTime":"2147483647","cookiePath":"\/","cookieDomain":"","redirection":"","cache":"1","refuse":"no","revoke_cookies":"0","revoke_cookies_opt":"automatic","secure":"1"};
+/* ]]> */
+</script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/plugins/cookie-notice/js/front.min.js?ver=1.2.46'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/plugins/sharify/admin/inc/sharifycounts.js?ver=1.4'></script>
+<script type='text/javascript' src='https://www.google.com/recaptcha/api.js?ver=01042017'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/themes/octotalks/js/jquery.min.js?ver=01042017'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/themes/octotalks/js/affix.js?ver=01042017'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/themes/octotalks/js/link-building.js?ver=01042017'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/themes/octotalks/js/controler.js?ver=01042017'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-content/themes/octotalks/js/library/highlight.pack.js?ver=01042017'></script>
+<script type='text/javascript' src='https://blog.octo.com/wp-includes/js/wp-embed.min.js?ver=5.2.3'></script>
+
+			<div id="cookie-notice" role="banner" class="cn-bottom wp-default" style="color: #fff; background-color: #030e2b;"><div class="cookie-notice-container"><span id="cn-notice-text">En navigant sur ce site, vous acceptez l’utilisation de cookies ou autres traceurs vous permettant une utilisation optimale du site (partages sur les réseaux sociaux, statistiques de visite, etc.)</span><a href="#" id="cn-accept-cookie" data-cookie-set="accept" class="cn-set-cookie cn-button wp-default button">J'accepte</a>
+				</div>
+				
+			</div><script>hljs.initHighlightingOnLoad();</script>
+
+</body>
+</html>
